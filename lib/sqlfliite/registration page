@@ -1,0 +1,157 @@
+
+import 'dart:math';
+
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:login/Sqflite/sqfliteHelper.dart';
+import 'package:login/Turisum%20appUi/Loging%20and%20signup.dart';
+import 'package:login/log.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main(){
+  runApp(MaterialApp(home: signup(),));
+}
+
+class signup extends StatelessWidget {
+  var formkey = GlobalKey<FormState>();
+  var showpass = true;
+  // final username = TextEditingController();
+  final email = TextEditingController();
+  final password = TextEditingController();
+  final cmpass = TextEditingController();
+
+
+  @override
+
+  Widget build(BuildContext context) {
+    void adnewuser( String email, String password) async {
+      var id = await Sqlhelper.AddNewUser(email,password);
+      if (id!=null){
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Logingpage()));
+      }
+
+    }
+
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("welcome"),
+        ),
+        body: Form(
+            key: formkey,
+            child: Column(
+              children: [
+                const Text(
+                  "Lets start",
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 30, right: 30, top: 30),
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                        hintText: "Name",
+                        prefixIcon: Icon(Icons.account_box_sharp),
+                        border: OutlineInputBorder()),
+                    validator: (username) {
+                      if (username!.isEmpty || username.length > 6) {
+                        return "please enter  your name";
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 30, right: 30, top: 30),
+                  child: TextFormField(
+                    controller: email,
+                    decoration: const InputDecoration(hintText: 'email',
+                        prefixIcon: Icon(Icons.account_box_sharp),
+                        border: OutlineInputBorder()),
+                    validator: (username) {
+                      if (username!.isEmpty || !username.contains('@')) {
+                        return "Enter a valied email";
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 30, right: 30, top: 30),
+                  child: TextFormField(
+                    controller: password,
+                    obscureText: showpass,
+                    obscuringCharacter: '*',
+                    decoration: InputDecoration(
+                        hintText: "password",
+                        prefixIcon: const Icon(Icons.password),
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                            },
+                            icon: Icon(showpass == true
+                                ? Icons.visibility_off_rounded
+                                : Icons.visibility)),
+                        border: const OutlineInputBorder()),
+                    validator: (password) {
+                      if (password!.isEmpty || password.length < 6) {
+                        return "Not a vlied password";
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 30, right: 30, top: 30),
+                  child: TextFormField(
+                    controller: cmpass,
+                    obscureText: showpass,
+                    obscuringCharacter: '*',
+                    decoration: InputDecoration(
+                        hintText: "confrim password",
+                        prefixIcon: const Icon(Icons.password),
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                            },
+                            icon: Icon(showpass == true
+                                ? Icons.visibility_off_rounded
+                                : Icons.visibility)),
+                        border: const OutlineInputBorder()),
+                    validator: (password) {
+                      if (password!.isEmpty || password.length < 6) {
+                        return "Not a vlied password";
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      final valid = formkey.currentState!.validate();
+                      if (valid) {
+                        adnewuser( email.text, password.text);
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>lgnpage()));
+                      } else {
+                        Fluttertoast.showToast(
+                            msg: "Sign up Failed",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM_LEFT,
+                            //timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+                      }
+                    },
+                    child: const Text("sign up"))
+              ],
+            )));
+  }
+}
+
+
